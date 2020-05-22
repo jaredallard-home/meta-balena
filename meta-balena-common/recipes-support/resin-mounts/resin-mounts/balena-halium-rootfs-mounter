@@ -1,0 +1,68 @@
+#!/bin/sh
+
+# Copyright 2020 Balena Ltd.
+#
+# Licensed under the Apache License, Version 2.0 (the "License");
+# you may not use this file except in compliance with the License.
+# You may obtain a copy of the License at
+#
+#    http://www.apache.org/licenses/LICENSE-2.0
+#
+# Unless required by applicable law or agreed to in writing, software
+# distributed under the License is distributed on an "AS IS" BASIS,
+# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+# See the License for the specific language governing permissions and
+# limitations under the License.
+
+#
+# Tool for mounting a balenaOS Halium rootfs
+#
+
+set -e
+
+# shellcheck disable=SC1091
+. /usr/libexec/os-helpers-fs
+. /usr/libexec/os-helpers-log
+
+info "Setup the user data directory"
+info "TODO"
+$mount -o bind,rw $datadir/userdata ${rootmnt}/media/internal
+$mount -o bind,rw $datadir/userdata/.cryptofs ${rootmnt}/media/cryptofs
+
+# From Halium's init.sh script
+ process_bind_mounts() {                                                            
+      # We need to mount some directories read-write in order to have a working   
+      # system so bind mount them from the outside into the rootfs. If we're         
+      # doing this the first time we have to remove the old data and copy the        
+      # initial data                                                                 
+      datadir=${rootmnt}/userdata/$distro_name-data                                  
+      tell_kmsg "Preparing $datadir"                                                 
+      if [ ! -e $datadir/.firstboot_done ] ; then                                    
+          for dir in var home ; do                                                   
+              rm -rf $datadir/$dir                                                   
+              mkdir -p $datadir/$dir                                                 
+                                                                                     
+              # Copy initial content to new location outside rootfs                  
+              cp -ra ${rootmnt}/$dir/* $datadir/$dir                                 
+          done                                                                       
+                                                                                     
+          mkdir -p $datadir/userdata                                                 
+          # Copy initial media to userdata                                           
+          cp -ra ${rootmnt}/media/internal/* $datadir/userdata/                      
+                                                                                     
+          # setup cryptofs which is not a real cryptofs yet                          
+          if [ -d $datadir/userdata/.cryptofs ] ; then                               
+              rm -rf $datadir/userdata/.cryptofs                                     
+          fi                                                                         
+          mkdir -p $datadir/userdata/.cryptofs                                       
+                                                                                     
+          # We're done with our first boot actions                                   
+          touch $datadir/.firstboot_done                                             
+      fi                                                                             
+                                                                                     
+      tell_kmsg "Bind-mount the directories"                                         
+      # bind-mount the directories to their correct place                            
+      for dir in var home ; do                                                       
+          mount -o bind,rw $datadir/$dir ${rootmnt}/$dir                             
+      done                                                                           
+  }   
