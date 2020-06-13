@@ -1,6 +1,13 @@
 Change log
 -----------
 
+# v2.52.0
+## (2020-06-13)
+
+* Add compressed memory swap support [Alex Gonzalez]
+* systemd-zram-swap: Add compressed memory swap support [Alex Gonzalez]
+* kernel-resin: Built-in zram configuration [Alex Gonzalez]
+
 # v2.51.2
 ## (2020-06-08)
 

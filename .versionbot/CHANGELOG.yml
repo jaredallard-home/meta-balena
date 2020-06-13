@@ -1,4 +1,56 @@
 - commits:
+    - subject: Add compressed memory swap support
+      hash: fad94d85ed138147e391e0be8225e5e21d8bf663
+      body: |
+        Enable compressed swap using zram by default.
+
+        Fixes #1908
+      footer:
+        Change-type: minor
+        change-type: minor
+        Changelog-entry: Add compressed memory swap support
+        changelog-entry: Add compressed memory swap support
+        Signed-off-by: Alex Gonzalez <alexg@balena.io>
+        signed-off-by: Alex Gonzalez <alexg@balena.io>
+      author: Alex Gonzalez
+    - subject: 'systemd-zram-swap: Add compressed memory swap support'
+      hash: 9a9a223ec188be6e960f47c4d70c6a1a3e68b0b0
+      body: |
+        This enables a compressed RAM swap of 25% of total system memory or 1GB,
+        whichever smallest.
+
+        Upstream Yocto has a zram implementation that's broken in warrior, and a
+        new implementation introduced in Zeus that does not work in BalenaOS as
+        we run two udevs, one in the initramfs and one in the main OS. The
+        mkswap needs to happen in the initramfs udev otherwise the udev database
+        is not updated with the swap device and the zram0 device is not detected
+        by systemd.
+
+        This implementation is simpler than the one upstream and common to all
+        the supported Yocto versions. It uses a udev rule in the initramfs that
+        creates the swap drive, and a swap unit in the main OS that enables it.
+      footer:
+        Change-type: patch
+        change-type: patch
+        Signed-off-by: Alex Gonzalez <alexg@balena.io>
+        signed-off-by: Alex Gonzalez <alexg@balena.io>
+      author: Alex Gonzalez
+    - subject: 'kernel-resin: Built-in zram configuration'
+      hash: c897aaa6b1f4714ef0f604d93ffa21fe8d5f59f8
+      body: >
+        In preparation to using zram swap drives make this configuration
+        built-in
+
+        so it is available in the initramfs.
+      footer:
+        Change-type: patch
+        change-type: patch
+        Signed-off-by: Alex Gonzalez <alexg@balena.io>
+        signed-off-by: Alex Gonzalez <alexg@balena.io>
+      author: Alex Gonzalez
+  version: 2.52.0
+  date: 2020-06-13T11:32:06.559Z
+- commits:
     - subject: 'Disable u-boot console, silence u-boot in production builds'
       hash: 908590c49f7f4f89bfd1c2f8fdcaf8a0f3f3eceb
       body: ''
